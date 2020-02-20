@@ -1,0 +1,79 @@
+package main
+
+import (
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
+	"time"
+)
+
+// this is our service implementation
+type serviceImpl struct {
+	cfg *ServiceConfig
+}
+
+func NewService(cfg *ServiceConfig) *serviceImpl {
+	return &serviceImpl{cfg: cfg}
+}
+
+// IgnoreFavicon is a dummy to handle browser favicon requests without warnings
+func (s *serviceImpl) IgnoreFavicon(c *gin.Context) {
+}
+
+// GetVersion reports the version of the service
+func (s *serviceImpl) GetVersion(c *gin.Context) {
+
+	vMap := make(map[string]string)
+	vMap["build"] = Version()
+	c.JSON(http.StatusOK, vMap)
+}
+
+// HealthCheck reports the health of the service
+func (s *serviceImpl) HealthCheck(c *gin.Context) {
+
+	type hcResp struct {
+		Healthy bool   `json:"healthy"`
+		Message string `json:"message,omitempty"`
+	}
+	hcMap := make(map[string]hcResp)
+	hcMap["mint-token"] = hcResp{Healthy: true}
+
+	c.JSON(http.StatusOK, hcMap)
+}
+
+// MintToken creates a new token
+func (s *serviceImpl) MintToken(c *gin.Context) {
+
+	tMap := make(map[string]string)
+	token, expires := s.makeToken()
+	tMap["token"] = token
+	tMap["expires"] = expires.Format("2006-01-02T15:04:05-0700")
+	c.JSON(http.StatusOK, tMap)
+}
+
+func (s *serviceImpl) makeToken() (string, time.Time) {
+
+	// Declare the expiration time of the token
+	expirationTime := time.Now().Add(time.Duration(s.cfg.ExpireHours) * time.Hour)
+
+	// Create the JWT claims, which includes expiry time
+	claims := &jwt.StandardClaims{
+		// In JWT, the expiry time is expressed as unix milliseconds
+		ExpiresAt: expirationTime.Unix(),
+	}
+
+	// Declare the token with the algorithm used for signing, and the claims
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Create the JWT string
+	tokenString, err := token.SignedString([]byte(s.cfg.SharedSecret))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return tokenString, expirationTime
+}
+
+//
+// end of file
+//
