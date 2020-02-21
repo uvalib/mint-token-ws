@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	//"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
@@ -25,11 +25,11 @@ func main() {
 	gin.DisableConsoleColor()
 	router := gin.Default()
 	router.Use(gzip.Gzip(gzip.DefaultCompression))
-	//corsCfg := cors.DefaultConfig()
-	//corsCfg.AllowAllOrigins = true
-	//corsCfg.AllowCredentials = true
-	//corsCfg.AddAllowHeaders("Authorization")
-	//router.Use(cors.New(corsCfg))
+	corsCfg := cors.DefaultConfig()
+	corsCfg.AllowAllOrigins = true
+	corsCfg.AllowCredentials = true
+	corsCfg.AddAllowHeaders("Authorization")
+	router.Use(cors.New(corsCfg))
 	p := ginprometheus.NewPrometheus("gin")
 
 	// roundabout setup of /metrics endpoint to avoid double-gzip of response
@@ -45,6 +45,7 @@ func main() {
 	router.GET("/version", svc.GetVersion)
 	router.GET("/healthcheck", svc.HealthCheck)
 	router.GET("/mint", svc.MintToken)
+	router.GET("/renew", svc.RenewToken)
 
 	portStr := fmt.Sprintf(":%d", cfg.Port)
 	log.Fatal(router.Run(portStr))
