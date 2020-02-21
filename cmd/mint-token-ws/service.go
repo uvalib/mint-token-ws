@@ -84,7 +84,7 @@ func (s *serviceImpl) RenewToken(c *gin.Context) {
 func (s *serviceImpl) makeToken() (string, time.Time) {
 
 	// Declare the expiration time of the token
-	expirationTime := time.Now().Add(time.Duration(s.cfg.ExpireHours) * time.Hour)
+	expirationTime := time.Now().Add(time.Duration(s.cfg.ExpireDays * 24) * time.Hour)
 
 	// Create the JWT claims, which includes expiry time
 	claims := &jwt.StandardClaims{

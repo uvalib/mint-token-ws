@@ -9,7 +9,7 @@ import (
 // ServiceConfig defines all of the archives transfer service configuration paramaters
 type ServiceConfig struct {
 	SharedSecret string
-	ExpireHours  int
+	ExpireDays   int
 	Port         int
 }
 
@@ -50,11 +50,11 @@ func LoadConfiguration() *ServiceConfig {
 	var cfg ServiceConfig
 
 	cfg.SharedSecret = ensureSetAndNonEmpty("MINT_TOKEN_SHARED_SECRET")
-	cfg.ExpireHours = envToInt("MINT_TOKEN_EXPIRE_HOURS")
+	cfg.ExpireDays = envToInt("MINT_TOKEN_EXPIRE_DAYS")
 	cfg.Port = envToInt("MINT_TOKEN_SERVICE_PORT")
 
 	log.Printf("[CONFIG] SharedSecret  = [REDACTED]")
-	log.Printf("[CONFIG] ExpireHours   = [%d]", cfg.ExpireHours)
+	log.Printf("[CONFIG] ExpireDays    = [%d]", cfg.ExpireDays)
 	log.Printf("[CONFIG] Port          = [%d]", cfg.Port)
 
 	return &cfg
