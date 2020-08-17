@@ -67,7 +67,7 @@ func (s *serviceImpl) RenewToken(c *gin.Context) {
 	}
 
 	// validate the token
-	if s.validateToken( components[1] ) == false {
+	if s.validateToken(components[1]) == false {
 		log.Printf("ERROR: invalid token in header: [%s]", components[1])
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
@@ -84,7 +84,7 @@ func (s *serviceImpl) RenewToken(c *gin.Context) {
 func (s *serviceImpl) makeToken() (string, time.Time) {
 
 	// Declare the expiration time of the token
-	expirationTime := time.Now().Add(time.Duration(s.cfg.ExpireDays * 24) * time.Hour)
+	expirationTime := time.Now().Add(time.Duration(s.cfg.ExpireDays*24) * time.Hour)
 
 	// Create the JWT claims, which includes expiry time
 	claims := &jwt.StandardClaims{
@@ -104,7 +104,7 @@ func (s *serviceImpl) makeToken() (string, time.Time) {
 }
 
 // validates the supplied token
-func (s *serviceImpl) validateToken( token string ) bool {
+func (s *serviceImpl) validateToken(token string) bool {
 
 	// Initialize a new instance of the standard claims
 	claims := &jwt.StandardClaims{}
